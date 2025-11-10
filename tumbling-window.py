@@ -28,7 +28,7 @@ def reducer(aggregated, event):
 
 sdf = (
     sdf.group_by(lambda event: event['type'], name='type')
-    .tumbling_window(duration_ms=timedelta(minutes=3))
+    .tumbling_window(duration_ms=timedelta(minutes=1))
     .reduce(initializer=initializer, reducer=reducer)
     .final()
 )
