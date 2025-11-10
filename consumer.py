@@ -4,17 +4,29 @@ import json
 
 def main():
     app = Application(
-        broker_address="localhost:19092",
+        broker_address="127.0.0.1:19092,127.0.0.1:29092,127.0.0.1:39092",
         loglevel="DEBUG",
-        consumer_group="weather_reader",
+        consumer_group="wikipedia-consumer",
         auto_offset_reset="earliest",
     )
 
     with app.get_consumer() as consumer:
-        consumer.subscribe(["weather_data_demo"])
+        consumer.subscribe(["wikipedia-changes"])
+        
+
 
         while True:
             msg = consumer.poll(1)
+            new=0
+            edit=0
+            move=0
+            protect=0
+            unprotect=0
+            revert=0
+            upload=0
+            log=0
+            categorize=0
+            delete=0
 
             if msg is None:
                 print("Waiting...")
@@ -25,7 +37,11 @@ def main():
                 value = json.loads(msg.value())
                 offset = msg.offset()
 
-                print(f"{offset} {key} {value}")
+                change_type=value.get("type")
+
+                
+
+                print(f"{offset} {key} {change_type}")
                 consumer.store_offsets(msg)
 
 
@@ -33,4 +49,4 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        pass
+        print(f"New: {new}, Edit: {edit}, Delete: {delete}, Move: {move}, Protect: {protect}")
