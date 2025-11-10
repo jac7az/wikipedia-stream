@@ -12,7 +12,7 @@ import json
 from requests_sse import EventSource
 from datetime import datetime
 
-KAFKA_BROKER = os.getenv("KAFKA_BROKER", "127.0.0.1:19092,127.0.0.1:29092,127.0.0.1:39092")
+KAFKA_BROKER = "127.0.0.1:19092,127.0.0.1:29092,127.0.0.1:39092"
 WIKIPEDIA_SSE_URL = "https://stream.wikimedia.org/v2/stream/recentchange"
 
 
@@ -28,7 +28,7 @@ class WikipediaStreamer:
             }
         )
         self.topic = self.app.topic(
-            name="wikipedia-edits",
+            name="wikipedia-changes",
             value_serializer="json",
         )
         print(f"Connected to Kafka broker at {KAFKA_BROKER}")
@@ -97,7 +97,7 @@ class WikipediaStreamer:
             headers = {
                 'User-Agent': 'WikipediaStreamer/1.0 (Educational Project; Python/requests-sse)',
                 'Accept': 'text/event-stream'
-            }
+            }   ####MUST HAVE#####################################
             
             # Connect to the SSE stream with headers
             with EventSource(WIKIPEDIA_SSE_URL, headers=headers) as source:
