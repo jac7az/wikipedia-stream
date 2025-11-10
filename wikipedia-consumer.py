@@ -2,6 +2,27 @@ from quixstreams import Application
 import json
 import redis
 
+def produce_to_kafka(event):
+    app=Application(
+        broker_address="127.0.0.1:19092,127.0.0.1:29092,127.0.0.1:39092",
+        loglevel='DEBUG',
+        producer_group='new-event-producer',
+        producer_extra_config={'broker.address.family':'v4'}
+        )
+    try:
+        value=event.value()
+        key.event.key()
+        serialized=event.topic.serialize(value=value)
+        with app.get_producer() as producer:
+            producer.produce(topic='new-articles',  #find new entries
+                             key=key,
+                             value=value
+                            )
+        return True
+    except Exception as e:
+        print("Error producing Kafka")
+        raise e
+
 def main():
     app = Application(
         broker_address="127.0.0.1:19092,127.0.0.1:29092,127.0.0.1:39092",
@@ -31,6 +52,8 @@ def main():
 
                 # get out the "type" key from the value
                 change_type = value.get("type")
+                if change_type=='new':
+                    produce_to_kafka(msg)
                 
                 # Only process if change_type is not None
                 if change_type is not None:
